@@ -10,4 +10,4 @@ Create a Python 3.9 virtual environment by issuing:
 
 To run the file:
 
-`python object_detection_script.py --modeldir=object_detection_model`
+`python main.py --modeldir=object_detection_model`

@@ -1,6 +1,3 @@
-
-
-# Import packages
 import os
 import argparse
 import cv2
@@ -9,7 +6,7 @@ import sys
 import time
 from threading import Thread
 import importlib.util
-
+import pyttsx3 as pt
 
 class VideoStream:
     """Camera object that controls video streaming from the Picamera"""
@@ -108,8 +105,6 @@ PATH_TO_LABELS = os.path.join(CWD_PATH,MODEL_NAME,LABELMAP_NAME)
 with open(PATH_TO_LABELS, 'r') as f:
     labels = [line.strip() for line in f.readlines()]
 
-# Have to do a weird fix for label map if using the COCO "starter model" from
-# https://www.tensorflow.org/lite/models/object_detection/overview
 # First label is '???', which has to be removed.
 if labels[0] == '???':
     del(labels[0])
@@ -152,6 +147,16 @@ freq = cv2.getTickFrequency()
 # Initialize video stream
 videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
 time.sleep(1)
+
+engine = pt.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', 'english_rp+f3')
+engine.setProperty('rate', 100)
+
+
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
 
 #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
 while True:
@@ -201,6 +206,40 @@ while True:
             label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
             cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
             cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
+
+            
+            # Color Detection
+            frame2 = frame1.copy()
+            hsv_frame = cv2.cvtColor(frame2, cv2. COLOR_BGR2HSV)
+            height1, width1=(ymax-ymin),(xmax-xmin)         
+            cx = int(width1 / 2)
+            cy = int(height1 / 2)
+
+            pixel_center = hsv_frame[cx,cy]
+            hue_value = pixel_center[0]
+
+            color = "Undefined"
+
+            if hue_value < 5:
+                color = "RED"
+            elif hue_value < 22:
+                color = "ORANGE"
+            elif hue_value < 33:
+                color = "YELLOW"
+            elif hue_value < 78:
+                color = "GREEN"
+            elif hue_value < 131:
+                color = "BLUE"
+            elif hue_value < 167:
+                color = "VIOLET"
+            else:  
+                color = "RED"
+
+            
+
+            print("This is a ",object_name," It is of colour ",color)
+            speech = "This is a ",object_name," It is of colour ",color
+            speak(speech)
 
     # Draw framerate in corner of frame
     cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
