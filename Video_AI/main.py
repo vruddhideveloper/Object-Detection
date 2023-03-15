@@ -15,12 +15,28 @@ video_client = videointelligence.VideoIntelligenceServiceClient()
 
 features = [videointelligence.Feature.LABEL_DETECTION]
 
-gs_URI = 'gs://dumbvideo/test.mp4'
+# gs_URI = 'gs://dumbvideo/test.mp4'
+# gs_URI = 'gs://dumbvideo/classroom.mp4'
+gs_URI = 'gs://dumbvideo/random3.mp4'
 
-operation = video_client.annotate_video(request={"input_uri": gs_URI, "features": features})
+labelDetectionConfig = videointelligence.LabelDetectionConfig(label_detection_mode=videointelligence.LabelDetectionMode.SHOT_AND_FRAME_MODE, stationary_camera=False)
+
+videoContext = videointelligence.VideoContext(
+    label_detection_config=labelDetectionConfig
+)
+
+request = videointelligence.AnnotateVideoRequest(
+    input_uri=gs_URI,
+    features=features,
+    video_context=videoContext
+)
+
+# operation = video_client.annotate_video(request={"input_uri": gs_URI, "features": features, "videoContext": {"labelDetectionConfig": {"labelDetectionMode": videointelligence.LabelDetectionMode.FRAME_MODE ,"stationaryCamera": True, "model": 'builtin/latest'}}})
+operation = video_client.annotate_video(request=request)
+
 print("\nProcessing video for label annotations:")
 
-result = operation.result(timeout=120)
+result = operation.result(timeout=300)
 
 segment_labels = result.annotation_results[0].segment_label_annotations
 
