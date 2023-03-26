@@ -15,7 +15,7 @@
 - Installing different libraries:
 
 ```
-sudo apt install libgtiff-dev libjpeg-dev libpng-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev crossbuild-essential-armhf libgtk-3-dev 
+sudo apt install libtiff-dev libjpeg-dev libpng-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev crossbuild-essential-armhf libgtk-3-dev 
 ```
 
 - Installing packages required to build:
@@ -67,12 +67,13 @@ rm -r *.tar.gz
 cd opencv-4.7.0
 mkdir build && cd build
 
-cmake -D CMAKE_BUILD_TYPE=RELEASE \ 
-    -D CMAKE_INSTALL_PREFIX=/usr/local \ 
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
     INSTALL_PYTHON_EXAMPLES=ON \
     -D INSTALL_C_EXAMPLES=OFF \
     -D OPENCV_ENABLE_NONFREE=ON \
-    -D OPENCV_EXTRA_MODULES_PATH=/home/pi/opencv_all/opencv_contrib/modules \ -D PYTHON_EXECUTABLE=$(which python) \
+    -D OPENCV_EXTRA_MODULES_PATH=/home/pi/opencv_all/opencv_contrib-4.7.0/modules \
+    -D PYTHON_EXECUTABLE=$(which python) \
     -D BUILD_opencv_python2=OFF \
     -D CMAKE_INSTALL_PREFIX=$(python -c "import sys; print(sys.prefix)") \
     -D PYTHON3_EXECUTABLE=$(which python) \
@@ -82,7 +83,7 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D BUILD_EXAMPLES=ON ..
 
 # Run the below commands inside the 'opencv_all/opencv-4.7.0/build/' directory
-# This can take upto 2 hours (dependss on the configuration of the RPi)
+# This can take upto 2 hours (depends on the configuration of the RPi)
 sudo make -j$(nproc)
 
 sudo make install
